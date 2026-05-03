@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>⚡ Whack-a-Mole! | Classic Arcade Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a5f2a 0%, #0e3a1a 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Poppins', 'Fredoka One', system-ui, -apple-system, 'Courier New', monospace;
+      margin: 0;
+      padding: 20px;
+      cursor: default;
+    }
+
+    /* main game panel */
+    .game-panel {
+      background: rgba(44, 24, 16, 0.75);
+      backdrop-filter: blur(3px);
+      border-radius: 80px 80px 60px 60px;
+      padding: 25px 20px 35px 20px;
+      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+      border: 1px solid #e9c891;
+    }
+
+    .game-container {
+      background: #7b3f1a;
+      border-radius: 70px;
+      padding: 20px 18px 25px 18px;
+      box-shadow: inset 0 0 0 5px #c9843e, inset 0 0 0 12px #a55c2a, 0 20px 30px rgba(0,0,0,0.4);
+    }
+
+    /* header stats */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      background: #fef1cf;
+      border-radius: 90px;
+      padding: 12px 28px;
+      margin-bottom: 35px;
+      font-weight: bold;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.1), 0 6px 0 #957550;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: #2e241f;
+      padding: 5px 20px;
+      border-radius: 50px;
+      color: #ffdd99;
+      text-shadow: 0 2px 0 #5a3a22;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 1.3rem;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 3px 0 #1e150f;
+    }
+
+    .stat-card span:first-child {
+      font-size: 1rem;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: monospace;
+      background: #00000055;
+      padding: 0 8px;
+      border-radius: 30px;
+      color: #fff3b7;
+      min-width: 70px;
+      text-align: center;
+    }
+
+    /* 3x3 grid of holes */
+    .holes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px 30px;
+      justify-items: center;
+      align-items: center;
+      padding: 15px 10px;
+      margin-bottom: 20px;
+    }
+
+    /* each hole */
+    .hole {
+      background: radial-gradient(circle at 35% 25%, #3e2a1f, #1f140c);
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      box-shadow: inset 0 8px 5px rgba(0,0,0,0.6), 0 8px 5px rgba(0,0,0,0.3), 0 0 0 7px #624a2e, 0 0 0 12px #3a2a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* mole character */
+    .mole {
+      font-size: 4.3rem;
+      transform: scale(0.8);
+      display: none;
+      filter: drop-shadow(2px 5px 3px rgba(0,0,0,0.5));
+      transition: transform 0.12s cubic-bezier(0.34, 1.2, 0.64, 1);
+      cursor: pointer;
+      pointer-events: none;  /* click handled by parent .hole */
+    }
+
+    /* active mole pops up */
+    .hole.active .mole {
+      display: block;
+      animation: popUp 0.2s cubic-bezier(0.34, 1.3, 0.65, 1) forwards;
+    }
+
+    /* active hole cursor */
+    .hole.active {
+      cursor: pointer;
+      background: radial-gradient(circle at 35% 25%, #5f4028, #2e1f12);
+      transform: scale(1.02);
+    }
+
+    /* whack animation */
+    .hole.whacked .mole {
+      animation: whackEffect 0.12s ease-out forwards !important;
+    }
+
+    @keyframes popUp {
+      0% {
+        transform: scale(0.2) translateY(20px);
+        opacity: 0;
+      }
+      80% {
+        transform: scale(1.1) translateY(-3px);
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes whackEffect {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.1) rotate(5deg); opacity: 0.6; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    /* game message + button */
+    .game-footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .status-message {
+      background: #2b211c;
+      padding: 8px 22px;
+      border-radius: 60px;
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #ffe3aa;
+      font-family: monospace;
+      letter-spacing: 1px;
+      text-align: center;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .new-game-btn {
+      background: #fdca40;
+      border: none;
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 10px 28px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-family: inherit;
+      color: #2c2b26;
+      box-shadow: 0 6px 0 #b4621a;
+      transition: 0.07s linear;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .new-game-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 #b4621a;
+    }
+
+    /* responsive tweaks */
+    @media (max-width: 550px) {
+      .holes-grid {
+        gap: 12px 16px;
+      }
+      .hole {
+        width: 80px;
+        height: 80px;
+      }
+      .mole {
+        font-size: 3rem;
+      }
+      .stat-card {
+        padding: 2px 12px;
+        font-size: 1rem;
+      }
+      .stat-value {
+        font-size: 1.5rem;
+        min-width: 55px;
+      }
+      .new-game-btn {
+        font-size: 1.1rem;
+        padding: 6px 20px;
+      }
+      .status-message {
+        font-size: 1rem;
+        padding: 5px 16px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .hole {
+        width: 70px;
+        height: 70px;
+      }
+      .mole {
+        font-size: 2.5rem;
+      }
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #ecd489;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div class="game-panel">
+  <div class="game-container">
+    <div class="stats">
+      <div class="stat-card"><span>🔨 SCORE</span><span class="stat-value" id="scoreValue">0</span></div>
+      <div class="stat-card"><span>⏱️ TIME</span><span class="stat-value" id="timerValue">30</span></div>
+      <div class="stat-card"><span>🏆 BEST</span><span class="stat-value" id="bestValue">0</span></div>
+    </div>
+
+    <!-- 3x3 mole holes -->
+    <div class="holes-grid" id="holesGrid">
+      <!-- 9 holes generated dynamically but we write static for clarity -->
+    </div>
+
+    <div class="game-footer">
+      <div class="status-message" id="gameStatusMsg">🔴 GAME NOT STARTED</div>
+      <button class="new-game-btn" id="newGameBtn">🕹️ NEW GAME</button>
+    </div>
+    <footer>⚡ WHACK THE MOLE! ⚡</footer>
+  </div>
+</div>
+
+<script>
+  // ---------- GAME CONFIG ----------
+  const INIT_TIME = 30;            // seconds
+  const MOLE_VISIBLE_TIME = 700;   // ms before mole hides
+  const SPAWN_INTERVAL_MS = 800;   // ms between spawn attempts
+
+  // DOM elements
+  const holesContainer = document.getElementById('holesGrid');
+  const scoreSpan = document.getElementById('scoreValue');
+  const timerSpan = document.getElementById('timerValue');
+  const bestSpan = document.getElementById('bestValue');
+  const newGameBtn = document.getElementById('newGameBtn');
+  const statusMsgDiv = document.getElementById('gameStatusMsg');
+
+  // game state variables
+  let holes = [];                // array of hole DOM elements
+  let activeTimeouts = [];      // stores timeout IDs per hole index (to cancel)
+  let gameActive = false;
+  let currentScore = 0;
+  let timeLeft = INIT_TIME;
+  let bestScore = 0;
+  
+  // interval IDs
+  let spawnIntervalId = null;
+  let countdownIntervalId = null;
+
+  // Helper: load best score from localStorage
+  function loadBestScore() {
+    const saved = localStorage.getItem('whackBestScore');
+    if (saved !== null && !isNaN(parseInt(saved))) {
+      bestScore = parseInt(saved);
+    } else {
+      bestScore = 0;
+    }
+    bestSpan.innerText = bestScore;
+  }
+
+  // Helper: update best score in UI & storage if currentScore exceeds
+  function updateBestScoreIfNeeded() {
+    if (currentScore > bestScore) {
+      bestScore = currentScore;
+      bestSpan.innerText = bestScore;
+      localStorage.setItem('whackBestScore', bestScore);
+    }
+  }
+
+  // Clear all active moles, timeouts, and remove active class
+  function deactivateAllMoles() {
+    for (let i = 0; i < holes.length; i++) {
+      if (holes[i].classList.contains('active')) {
+        holes[i].classList.remove('active');
+        holes[i].classList.remove('whacked'); // just cleanup
+      }
+      // clear any pending hide timeouts
+      if (activeTimeouts[i] !== null && activeTimeouts[i] !== undefined) {
+        clearTimeout(activeTimeouts[i]);
+        activeTimeouts[i] = null;
+      }
+    }
+  }
+
+  // remove mole from specific hole (without whack score, just hide)
+  function hideMole(holeIndex) {
+    if (!holes[holeIndex]) return;
+    const hole = holes[holeIndex];
+    if (hole.classList.contains('active')) {
+      hole.classList.remove('active');
+      hole.classList.remove('whacked');
+    }
+    if (activeTimeouts[holeIndex]) {
+      clearTimeout(activeTimeouts[holeIndex]);
+      activeTimeouts[holeIndex] = null;
+    }
+  }
+
+  // whack action: called when player clicks on active mole
+  function whackMole(holeIndex) {
+    if (!gameActive) return false;
+    const hole = holes[holeIndex];
+    if (!hole.classList.contains('active')) return false;
+    
+    // Increment score
+    currentScore++;
+    scoreSpan.innerText = currentScore;
+    
+    // Update best score live during game (immediate satisfaction)
+    if (currentScore > bestScore) {
+      bestScore = currentScore;
+      bestSpan.innerText = bestScore;
+      localStorage.setItem('whackBestScore', bestScore);
+    }
+    
+    // add whack animation class
+    hole.classList.add('whacked');
+    // remove active mole immediately (prevent double-whack)
+    hole.classList.remove('active');
+    
+    // cancel auto hide timeout for this mole
+    if (activeTimeouts[holeIndex]) {
+      clearTimeout(activeTimeouts[holeIndex]);
+      activeTimeouts[holeIndex] = null;
+    }
+    
+    // small visual feedback: remove whacked class after animation ends
+    setTimeout(() => {
+      if (hole) hole.classList.remove('whacked');
+    }, 120);
+    
+    // haptic / fun effect (subtle)
+    return true;
+  }
+
+  // Spawn a mole in a random available hole (not already active)
+  function trySpawnMole() {
+    if (!gameActive) return false;
+    
+    // Collect holes that are NOT currently active
+    const inactiveHoles = [];
+    for (let i = 0; i < holes.length; i++) {
+      if (!holes[i].classList.contains('active')) {
+        inactiveHoles.push(i);
+      }
+    }
+    
+    if (inactiveHoles.length === 0) {
+      // all holes busy, no spawn this cycle
+      return false;
+    }
+    
+    // pick random inactive hole
+    const randomIndex = Math.floor(Math.random() * inactiveHoles.length);
+    const chosenHoleIdx = inactiveHoles[randomIndex];
+    const hole = holes[chosenHoleIdx];
+    
+    // activate mole
+    hole.classList.add('active');
+    hole.classList.remove('whacked'); // ensure clean
+    
+    // set automatic hide after MOLE_VISIBLE_TIME
+    const hideTimeout = setTimeout(() => {
+      if (gameActive && holes[chosenHoleIdx] && holes[chosenHoleIdx].classList.contains('active')) {
+        hideMole(chosenHoleIdx);
+      } else if (!gameActive) {
+        // if game ended, just ensure hidden
+        if (holes[chosenHoleIdx]) holes[chosenHoleIdx].classList.remove('active');
+      }
+      if (activeTimeouts[chosenHoleIdx]) activeTimeouts[chosenHoleIdx] = null;
+    }, MOLE_VISIBLE_TIME);
+    
+    // store timeout reference
+    if (activeTimeouts[chosenHoleIdx]) clearTimeout(activeTimeouts[chosenHoleIdx]);
+    activeTimeouts[chosenHoleIdx] = hideTimeout;
+    return true;
+  }
+
+  // periodic spawn loop
+  function startSpawner() {
+    if (spawnIntervalId) clearInterval(spawnIntervalId);
+    spawnIntervalId = setInterval(() => {
+      if (gameActive) {
+        trySpawnMole();
+      } else {
+        // if game not active, stop spawning (safety)
+        if (spawnIntervalId) {
+          clearInterval(spawnIntervalId);
+          spawnIntervalId = null;
+        }
+      }
+    }, SPAWN_INTERVAL_MS);
+  }
+
+  // update timer display
+  function updateTimerUI() {
+    timerSpan.innerText = timeLeft;
+  }
+
+  // end game: disable everything, show game over, update highscore
+  function endGame() {
+    if (!gameActive) return;
+    gameActive = false;
+    
+    // stop intervals
+    if (spawnIntervalId) {
+      clearInterval(spawnIntervalId);
+      spawnIntervalId = null;
+    }
+    if (countdownIntervalId) {
+      clearInterval(countdownIntervalId);
+      countdownIntervalId = null;
+    }
+    
+    // hide all active moles
+    deactivateAllMoles();
+    
+    // final best check (just in case)
+    updateBestScoreIfNeeded();
+    
+    // update status message
+    statusMsgDiv.innerHTML = "💀 GAME OVER 💀";
+    statusMsgDiv.style.color = "#ffb47b";
+  }
+
+  // Countdown function (called by interval)
+  function countdownTick() {
+    if (!gameActive) {
+      // extra safety: if gameActive false but interval still runs, clear it
+      if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+      }
+      return;
+    }
+    
+    if (timeLeft <= 1) {
+      // time's up!
+      timeLeft = 0;
+      updateTimerUI();
+      endGame();
+    } else {
+      timeLeft--;
+      updateTimerUI();
+    }
+  }
+
+  // start countdown timer engine
+  function startCountdown() {
+    if (countdownIntervalId) clearInterval(countdownIntervalId);
+    countdownIntervalId = setInterval(() => {
+      countdownTick();
+    }, 1000);
+  }
+
+  // full reset and start fresh game
+  function resetAndStartGame() {
+    // kill ongoing game & clean intervals
+    if (spawnIntervalId) {
+      clearInterval(spawnIntervalId);
+      spawnIntervalId = null;
+    }
+    if (countdownIntervalId) {
+      clearInterval(countdownIntervalId);
+      countdownIntervalId = null;
+    }
+    
+    // deactivate all moles and clear all hide timeouts
+    for (let i = 0; i < holes.length; i++) {
+      if (activeTimeouts[i]) {
+        clearTimeout(activeTimeouts[i]);
+        activeTimeouts[i] = null;
+      }
+      holes[i].classList.remove('active');
+      holes[i].classList.remove('whacked');
+    }
+    
+    // reset game variables
+    gameActive = true;
+    currentScore = 0;
+    timeLeft = INIT_TIME;
+    scoreSpan.innerText = "0";
+    updateTimerUI();
+    
+    // load best again from storage (just to sync)
+    loadBestScore();
+    
+    // ensure no leftovers highscore overshoot, but current best unchanged
+    statusMsgDiv.innerHTML = "🐭 WHACK! GAME ACTIVE 🐭";
+    statusMsgDiv.style.color = "#ffe3aa";
+    
+    // start fresh spawner & countdown
+    startSpawner();
+    startCountdown();
+    
+    // optional: small delay to ensure spawning works instantly (first mole soon)
+    // also pre-clear any dead flags
+  }
+
+  // click handler for each hole (whacking logic)
+  function setupHoleClickHandler(hole, idx) {
+    hole.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!gameActive) return;
+      // check if the hole has active mole
+      if (hole.classList.contains('active')) {
+        whackMole(idx);
+      }
+      // else click on empty hole does nothing (no penalty)
+    });
+  }
+
+  // create dynamic HTML holes & initialize arrays
+  function buildGameBoard() {
+    holesContainer.innerHTML = '';
+    const holeCount = 9;
+    for (let i = 0; i < holeCount; i++) {
+      const holeDiv = document.createElement('div');
+      holeDiv.className = 'hole';
+      holeDiv.setAttribute('data-idx', i);
+      
+      const moleSpan = document.createElement('div');
+      moleSpan.className = 'mole';
+      // different mole expressions for fun (random but cute)
+      const moleVariants = ['🐭', '🐹', '🐭✨', '🐭💥', '🐭⚡'];
+      // choose random variant but will be consistent look per hole? fine
+      moleSpan.innerText = moleVariants[i % moleVariants.length];
+      holeDiv.appendChild(moleSpan);
+      holesContainer.appendChild(holeDiv);
+    }
+    
+    // refresh holes array
+    holes = Array.from(document.querySelectorAll('.hole'));
+    activeTimeouts = new Array(holes.length).fill(null);
+    
+    // attach click events
+    holes.forEach((hole, idx) => {
+      setupHoleClickHandler(hole, idx);
+    });
+  }
+
+  // new game button logic
+  function attachNewGameButton() {
+    newGameBtn.addEventListener('click', () => {
+      // if game is active, we kill it and reset completely
+      if (gameActive) {
+        // run endGame logic but without double message (soft reset)
+        if (spawnIntervalId) clearInterval(spawnIntervalId);
+        if (countdownIntervalId) clearInterval(countdownIntervalId);
+        spawnIntervalId = null;
+        countdownIntervalId = null;
+        gameActive = false;
+        deactivateAllMoles();
+      }
+      // fresh restart
+      resetAndStartGame();
+    });
+  }
+
+  // Initialize stats and best score when page loads
+  function initGame() {
+    buildGameBoard();
+    loadBestScore();
+    attachNewGameButton();
+    // game not started initially, show welcome message & no active spawn
+    gameActive = false;
+    statusMsgDiv.innerHTML = "🔨 PRESS 'NEW GAME' 🔨";
+    statusMsgDiv.style.color = "#ffdd99";
+    scoreSpan.innerText = "0";
+    timerSpan.innerText = INIT_TIME;
+    // ensure all holes are inactive
+    deactivateAllMoles();
+    // no active intervals
+    if (spawnIntervalId) clearInterval(spawnIntervalId);
+    if (countdownIntervalId) clearInterval(countdownIntervalId);
+    spawnIntervalId = null;
+    countdownIntervalId = null;
+  }
+
+  // start everything when DOM ready
+  window.addEventListener('DOMContentLoaded', initGame);
+</script>
+</body>
+  </html>
