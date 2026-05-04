@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>🧠 Binary Whack: CS Quiz Mole | Learn & Whack</title>
+  <title>✅❌ Binary Whack: Yes/No CS Quiz</title>
   <style>
     * {
       box-sizing: border-box;
@@ -129,8 +129,8 @@
       font-weight: bold;
       padding: 8px 6px;
       border-radius: 50px;
-      font-size: 1.2rem;
-      width: 90%;
+      font-size: 1.3rem;
+      width: 85%;
       text-align: center;
       box-shadow: 0 5px 0 #aa7733;
       transition: all 0.1s ease;
@@ -138,7 +138,22 @@
       font-weight: 800;
       letter-spacing: 1px;
       pointer-events: none;
-      word-break: break-word;
+      word-break: keep-all;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* on very small screens, allow wrapping */
+    @media (max-width: 550px) {
+      .hole .mole-answer {
+        font-size: 1rem;
+        white-space: normal;
+        word-break: break-word;
+        padding: 5px 3px;
+      }
+      .hole { width: 85px; height: 85px; }
+      .question-text { font-size: 1.2rem; }
     }
 
     .hole.active-mole {
@@ -217,17 +232,6 @@
       transition: width 0.1s linear;
     }
 
-    @media (max-width: 600px) {
-      .hole { width: 80px; height: 80px; }
-      .mole-answer { font-size: 0.9rem; padding: 5px 4px; }
-      .question-text { font-size: 1.2rem; }
-      .stat-value { font-size: 1.5rem; min-width: 55px; }
-    }
-
-    @media (max-width: 450px) {
-      .hole { width: 70px; height: 70px; }
-    }
-
     footer {
       text-align: center;
       font-size: 0.7rem;
@@ -255,33 +259,34 @@
     <div class="holes-grid" id="holesGrid"></div>
 
     <div class="status-area">
-      <div class="game-status" id="gameStatusMsg">🔍 WHACK THE RIGHT MOLE!</div>
+      <div class="game-status" id="gameStatusMsg">✅ WHACK YES or NO ✅</div>
       <button class="new-game-btn" id="newGameBtn">🕹️ NEW GAME</button>
     </div>
-    <footer>⚡ Binary basics + silly questions | Whack correct answer ⚡</footer>
+    <footer>⚡ Binary CS basics – Whack the correct Yes/No answer! ⚡</footer>
   </div>
 </div>
 
 <script>
-  // ---------- 🌟 BINARY + SILLY QUESTION BANK ----------
+  // ---------- NEW QUESTION BANK: ONLY YES / NO (or TRUE/FALSE) ANSWERS ----------
   const QUESTION_BANK = [
-    { text: "What is the binary representation of decimal 5?", correct: "101", wrongs: ["100", "110", "111"] },
-    { text: "How many bits are in a byte?", correct: "8", wrongs: ["4", "16", "32"] },
-    { text: "What does 'ASCII' stand for in computing?", correct: "American Standard Code for Info Interchange", wrongs: ["Apple Standard Code", "Auto Secure Code", "Advanced Binary Code"] },
-    { text: "Which of these is a valid binary digit?", correct: "0", wrongs: ["2", "A", "B"] },
-    { text: "What is 1010₂ in decimal?", correct: "10", wrongs: ["8", "12", "5"] },
-    { text: "A group of 4 bits is called a:", correct: "Nibble", wrongs: ["Byte", "Word", "BitSlice"] },
-    { text: "What is 1 + 1 in binary??", correct: "10", wrongs: ["2", "0", "11"] },
-    { text: "Which base is the binary system?", correct: "Base-2", wrongs: ["Base-10", "Base-16", "Base-8"] },
-    { text: "What does 'bit' stand for?", correct: "Binary digit", wrongs: ["Byte index token", "Basic integer type", "Bidirectional transfer"] },
-    { text: "Why did the binary programmer go to therapy?", correct: "He had too many bits to process", wrongs: ["Because he lost his cache", "Stack overflow", "No sleep"] },
-    { text: "What is a computer's favorite beat?", correct: "An algorithm", wrongs: ["A drum loop", "A byte", "A gigabyte"] },
-    { text: "Which superhero uses binary code to fight?", correct: "The Bit Crusader", wrongs: ["Iron Man", "Batman (Binary?)", "Superman"] },
-    { text: "Why was the binary book sad?", correct: "It had too many 0's", wrongs: ["It got deleted", "No happy ending", "Too many 1's"] },
-    { text: "What do you call a computer that sings?", correct: "A Dell", wrongs: ["A MacBook", "A Chromebook", "A Raspberry Pi"] },
-    { text: "How many bytes are in a kilobyte (binary)?", correct: "1024", wrongs: ["1000", "512", "2048"] },
-    { text: "What is the 'spider' of the internet?", correct: "Web crawler", wrongs: ["Virus", "Firewall", "Cookie"] },
-    { text: "What is a popular Linux penguin mascot?", correct: "Tux", wrongs: ["Gnu", "Pingy", "Linus"] }
+    { text: "Is binary a base-2 number system?", correct: "Yes", wrongs: ["No", "Maybe", "Absolutely not"] },
+    { text: "Is 1 + 1 in binary equal to '10'?", correct: "Yes", wrongs: ["No", "2", "11"] },
+    { text: "Does a byte contain 8 bits?", correct: "Yes", wrongs: ["No", "4 bits", "16 bits"] },
+    { text: "Is the decimal number 5 written as '101' in binary?", correct: "Yes", wrongs: ["No", "110", "100"] },
+    { text: "Is a nibble equal to 4 bits?", correct: "Yes", wrongs: ["No", "2 bits", "8 bits"] },
+    { text: "Is the binary digit '2' valid?", correct: "No", wrongs: ["Yes", "Sometimes", "Only in octal"] },
+    { text: "Is ASCII a character encoding standard?", correct: "Yes", wrongs: ["No", "Only for numbers", "It's a video format"] },
+    { text: "Does 'bit' stand for 'Binary Digit'?", correct: "Yes", wrongs: ["No", "Basic Input Term", "Byte Interval Token"] },
+    { text: "Is 1024 bytes equal to one kilobyte (binary)?", correct: "Yes", wrongs: ["No", "1000 bytes", "512 bytes"] },
+    { text: "Is a 'web crawler' a kind of spider robot?", correct: "Yes", wrongs: ["No", "A virus", "A type of browser"] },
+    { text: "Is the Linux mascot named Tux?", correct: "Yes", wrongs: ["No", "Gnu", "Linus"] },
+    { text: "Is 'The Bit Crusader' a real superhero in CS?", correct: "No", wrongs: ["Yes", "Of course", "From Marvel"] },
+    { text: "Does a computer sing better than a human?", correct: "No", wrongs: ["Yes", "Always", "Definitely"] },
+    { text: "Is it possible to have a negative binary number?", correct: "Yes", wrongs: ["No", "Only in dreams", "Never"] },
+    { text: "Is the number 10 in binary equal to decimal 2?", correct: "Yes", wrongs: ["No", "3", "1"] },
+    { text: "Is an algorithm a type of dance move?", correct: "No", wrongs: ["Yes", "It is a song", "Maybe"] },
+    { text: "Does 'HTTP' stand for 'HyperText Transfer Protocol'?", correct: "Yes", wrongs: ["No", "High Transfer Text", "Hyperlink Tool"] },
+    { text: "Can you store a letter in a single bit?", correct: "No", wrongs: ["Yes", "Only in uppercase", "With compression"] }
   ];
 
   function getRandomItems(arr, count) {
@@ -305,7 +310,6 @@
 
   let holes = [];
   let currentAnswers = [];
-  let currentQuestionObj = null;
   let gameActive = false;
   let currentScore = 0;
   let timeLeft = 45;
@@ -420,24 +424,28 @@
     
     const randomIndex = Math.floor(Math.random() * QUESTION_BANK.length);
     const q = QUESTION_BANK[randomIndex];
-    currentQuestionObj = q;
-    questionTextEl.innerHTML = `🧠 ${q.text} 🧠`;
+    questionTextEl.innerHTML = `🤔 ${q.text} 🤔`;
     
+    // Build answer options: 1 correct + 3 wrongs (ensure they are short Yes/No style)
     let wrongPool = [...q.wrongs];
-    const fallbackWrongs = ["0101", "N/A", "Maybe?", "False", "True", "B100", "0b10"];
+    // Fallback wrong answers (short)
+    const fallbackWrongs = ["No", "Yes", "Maybe", "False", "True", "Nope", "Yep"];
     while (wrongPool.length < 3) wrongPool.push(...fallbackWrongs);
     const selectedWrongs = getRandomItems(wrongPool, 3);
+    // Ensure correct answer is either "Yes" or "No" (or True/False) – our questions already use that
     const answerOptions = [
       { text: q.correct, isCorrect: true },
       { text: selectedWrongs[0], isCorrect: false },
       { text: selectedWrongs[1], isCorrect: false },
       { text: selectedWrongs[2], isCorrect: false }
     ];
+    // Shuffle answers
     for (let i = answerOptions.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [answerOptions[i], answerOptions[j]] = [answerOptions[j], answerOptions[i]];
     }
     
+    // Choose 4 distinct holes from 9
     const holeIndices = Array.from({ length: holes.length }, (_, i) => i);
     for (let i = holeIndices.length - 1; i > 0; i--) {
       const r = Math.floor(Math.random() * (i + 1));
@@ -463,7 +471,7 @@
     questionTimeLeft = 10;
     updateQuestionBar();
     resetQuestionTimer();
-    gameStatusSpan.innerHTML = "🔨 WHACK THE CORRECT MOLE! 🔨";
+    gameStatusSpan.innerHTML = "🔨 WHACK THE CORRECT YES/NO! 🔨";
   }
 
   function handleWhack(holeIndex) {
@@ -531,7 +539,6 @@
   }
 
   function startNewGame() {
-    // Kill all existing timers to prevent freezing
     stopAllIntervalsAndTimeouts();
     if (gameActive) {
       gameActive = false;
@@ -544,7 +551,7 @@
     scoreSpan.innerText = "0";
     updateGameTimerUI();
     loadBestScore();
-    gameStatusSpan.innerHTML = "🎉 NEW GAME! WHACK SMART! 🎉";
+    gameStatusSpan.innerHTML = "🎉 NEW GAME! WHACK YES OR NO! 🎉";
     activeWhackLock = false;
     
     clearAllMoles();
@@ -580,8 +587,7 @@
     buildHoles();
     attachEvents();
     loadBestScore();
-    // Auto-start the game so it doesn't freeze on opening
-    startNewGame();
+    startNewGame(); // Auto-start on load
   }
 
   initGame();
