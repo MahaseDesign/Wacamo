@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>⚡ Whack-a-Mole! | Classic Arcade Game</title>
+  <title>🧠 Binary Whack: CS Quiz Mole | Learn & Whack</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,91 +12,102 @@
     }
 
     body {
-      background: linear-gradient(145deg, #1a5f2a 0%, #0e3a1a 100%);
+      background: linear-gradient(145deg, #1f3b2c 0%, #0a2b1a 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Segoe UI', 'Poppins', 'Fredoka One', system-ui, -apple-system, 'Courier New', monospace;
+      font-family: 'Segoe UI', 'Poppins', 'Fredoka One', monospace;
       margin: 0;
       padding: 20px;
-      cursor: default;
     }
 
-    /* main game panel */
+    .quiz-arena {
+      background: rgba(20, 15, 10, 0.8);
+      backdrop-filter: blur(4px);
+      border-radius: 70px;
+      padding: 20px 25px 35px 25px;
+      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255,255,200,0.2);
+      border: 2px solid #ffd966;
+    }
+
     .game-panel {
-      background: rgba(44, 24, 16, 0.75);
-      backdrop-filter: blur(3px);
-      border-radius: 80px 80px 60px 60px;
-      padding: 25px 20px 35px 20px;
-      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.3);
-      border: 1px solid #e9c891;
-    }
-
-    .game-container {
       background: #7b3f1a;
       border-radius: 70px;
-      padding: 20px 18px 25px 18px;
-      box-shadow: inset 0 0 0 5px #c9843e, inset 0 0 0 12px #a55c2a, 0 20px 30px rgba(0,0,0,0.4);
+      padding: 18px 20px 25px 20px;
+      box-shadow: inset 0 0 0 5px #c9843e, inset 0 0 0 12px #a55c2a, 0 20px 30px black;
     }
 
-    /* header stats */
+    .question-area {
+      background: #2c241aff;
+      margin-bottom: 25px;
+      padding: 18px 15px;
+      border-radius: 60px;
+      text-align: center;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 5px 0 #5a3a22;
+    }
+
+    .question-text {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #ffecb3;
+      text-shadow: 0 2px 0 #4a2a12;
+      letter-spacing: 1px;
+      word-break: break-word;
+      background: #00000066;
+      padding: 12px 20px;
+      border-radius: 50px;
+      display: inline-block;
+      max-width: 90%;
+    }
+
     .stats {
       display: flex;
       justify-content: space-between;
       background: #fef1cf;
       border-radius: 90px;
-      padding: 12px 28px;
-      margin-bottom: 35px;
+      padding: 8px 20px;
+      margin-bottom: 20px;
       font-weight: bold;
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.1), 0 6px 0 #957550;
-      gap: 20px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 5px 0 #957550;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
     .stat-card {
       background: #2e241f;
-      padding: 5px 20px;
+      padding: 4px 18px;
       border-radius: 50px;
       color: #ffdd99;
       text-shadow: 0 2px 0 #5a3a22;
       display: flex;
       align-items: baseline;
-      gap: 12px;
-      font-size: 1.3rem;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 3px 0 #1e150f;
-    }
-
-    .stat-card span:first-child {
-      font-size: 1rem;
-      letter-spacing: 1px;
-      font-weight: 500;
+      gap: 10px;
+      font-size: 1.2rem;
     }
 
     .stat-value {
       font-size: 2rem;
       font-weight: 800;
       font-family: monospace;
-      background: #00000055;
-      padding: 0 8px;
-      border-radius: 30px;
-      color: #fff3b7;
+      background: #000000aa;
+      padding: 0 10px;
+      border-radius: 40px;
       min-width: 70px;
       text-align: center;
+      color: #fff3b7;
     }
 
-    /* 3x3 grid of holes */
     .holes-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px 30px;
+      gap: 18px 20px;
       justify-items: center;
       align-items: center;
-      padding: 15px 10px;
-      margin-bottom: 20px;
+      padding: 10px 5px;
+      margin: 15px 0 20px;
     }
 
-    /* each hole */
     .hole {
       background: radial-gradient(circle at 35% 25%, #3e2a1f, #1f140c);
       width: 110px;
@@ -106,456 +117,474 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.1s ease;
+      transition: 0.07s linear;
       cursor: pointer;
       position: relative;
+      text-align: center;
     }
 
-    /* mole character */
-    .mole {
-      font-size: 4.3rem;
-      transform: scale(0.8);
-      display: none;
-      filter: drop-shadow(2px 5px 3px rgba(0,0,0,0.5));
-      transition: transform 0.12s cubic-bezier(0.34, 1.2, 0.64, 1);
-      cursor: pointer;
+    .hole .mole-answer {
+      background: #f3c26b;
+      color: #2d2b1f;
+      font-weight: bold;
+      padding: 8px 6px;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 0 #aa7733;
+      transition: all 0.1s ease;
+      font-family: monospace;
+      font-weight: 800;
+      letter-spacing: 1px;
       pointer-events: none;
+      word-break: break-word;
     }
 
-    /* active mole pops up */
-    .hole.active .mole {
-      display: block;
-      animation: popUp 0.2s cubic-bezier(0.34, 1.3, 0.65, 1) forwards;
-    }
-
-    .hole.active {
-      cursor: pointer;
+    .hole.active-mole {
       background: radial-gradient(circle at 35% 25%, #5f4028, #2e1f12);
       transform: scale(1.02);
+      cursor: pointer;
     }
 
-    .hole.whacked .mole {
-      animation: whackEffect 0.12s ease-out forwards !important;
+    .hole.whacked .mole-answer {
+      animation: whackPop 0.12s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
     }
 
-    @keyframes popUp {
-      0% {
-        transform: scale(0.2) translateY(20px);
-        opacity: 0;
-      }
-      80% {
-        transform: scale(1.1) translateY(-3px);
-      }
-      100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes whackEffect {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.1) rotate(5deg); opacity: 0.6; }
+    @keyframes whackPop {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.1) rotate(3deg); background: #ffaa44; }
       100% { transform: scale(0); opacity: 0; }
     }
 
-    .game-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 10px;
-      gap: 20px;
-      flex-wrap: wrap;
+    .hole.wrong-flash {
+      background: radial-gradient(circle at 35% 25%, #9e3a2a, #5a1e10);
+      box-shadow: 0 0 0 3px #ff5555;
     }
 
-    .status-message {
+    .status-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .game-status {
       background: #2b211c;
       padding: 8px 22px;
       border-radius: 60px;
       font-weight: bold;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       color: #ffe3aa;
       font-family: monospace;
-      letter-spacing: 1px;
-      text-align: center;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.2);
     }
 
     .new-game-btn {
       background: #fdca40;
       border: none;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: bold;
-      padding: 10px 28px;
+      padding: 8px 28px;
       border-radius: 40px;
       cursor: pointer;
       font-family: inherit;
       color: #2c2b26;
-      box-shadow: 0 6px 0 #b4621a;
+      box-shadow: 0 5px 0 #b4621a;
       transition: 0.07s linear;
-      letter-spacing: 1px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .new-game-btn:active {
       transform: translateY(3px);
-      box-shadow: 0 3px 0 #b4621a;
+      box-shadow: 0 2px 0 #b4621a;
     }
 
-    @media (max-width: 550px) {
-      .holes-grid {
-        gap: 12px 16px;
-      }
-      .hole {
-        width: 80px;
-        height: 80px;
-      }
-      .mole {
-        font-size: 3rem;
-      }
-      .stat-card {
-        padding: 2px 12px;
-        font-size: 1rem;
-      }
-      .stat-value {
-        font-size: 1.5rem;
-        min-width: 55px;
-      }
-      .new-game-btn {
-        font-size: 1.1rem;
-        padding: 6px 20px;
-      }
-      .status-message {
-        font-size: 1rem;
-        padding: 5px 16px;
-      }
+    .timer-bar {
+      background: #3c2c1c;
+      border-radius: 40px;
+      height: 12px;
+      width: 100%;
+      margin-top: 12px;
+      overflow: hidden;
     }
 
-    @media (max-width: 400px) {
-      .hole {
-        width: 70px;
-        height: 70px;
-      }
-      .mole {
-        font-size: 2.5rem;
-      }
+    .timer-fill {
+      background: #ffbb44;
+      width: 100%;
+      height: 100%;
+      border-radius: 40px;
+      transition: width 0.1s linear;
+    }
+
+    @media (max-width: 600px) {
+      .hole { width: 80px; height: 80px; }
+      .mole-answer { font-size: 0.9rem; padding: 5px 4px; }
+      .question-text { font-size: 1.2rem; }
+      .stat-value { font-size: 1.5rem; min-width: 55px; }
+    }
+
+    @media (max-width: 450px) {
+      .hole { width: 70px; height: 70px; }
     }
 
     footer {
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #ecd489;
-      margin-top: 20px;
-      font-weight: 500;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-<div class="game-panel">
-  <div class="game-container">
+<div class="quiz-arena">
+  <div class="game-panel">
+    <div class="question-area">
+      <div class="question-text" id="questionText">⚡ LOADING... ⚡</div>
+      <div class="timer-bar">
+        <div class="timer-fill" id="questionTimerFill" style="width: 100%;"></div>
+      </div>
+    </div>
+
     <div class="stats">
-      <div class="stat-card"><span>🔨 SCORE</span><span class="stat-value" id="scoreValue">0</span></div>
-      <div class="stat-card"><span>⏱️ TIME</span><span class="stat-value" id="timerValue">30</span></div>
+      <div class="stat-card"><span>🎓 SCORE</span><span class="stat-value" id="scoreValue">0</span></div>
+      <div class="stat-card"><span>⏱️ TIME</span><span class="stat-value" id="timerValue">45</span></div>
       <div class="stat-card"><span>🏆 BEST</span><span class="stat-value" id="bestValue">0</span></div>
     </div>
 
     <div class="holes-grid" id="holesGrid"></div>
 
-    <div class="game-footer">
-      <div class="status-message" id="gameStatusMsg">🔨 PRESS 'NEW GAME' 🔨</div>
+    <div class="status-area">
+      <div class="game-status" id="gameStatusMsg">🔍 WHACK THE RIGHT MOLE!</div>
       <button class="new-game-btn" id="newGameBtn">🕹️ NEW GAME</button>
     </div>
-    <footer>⚡ WHACK THE MOLE! ⚡</footer>
+    <footer>⚡ Binary basics + silly questions | Whack correct answer ⚡</footer>
   </div>
 </div>
 
 <script>
-  const INIT_TIME = 30;
-  const MOLE_VISIBLE_TIME = 700;
-  const SPAWN_INTERVAL_MS = 800;
+  // ---------- 🌟 BINARY + SILLY QUESTION BANK ----------
+  const QUESTION_BANK = [
+    { text: "What is the binary representation of decimal 5?", correct: "101", wrongs: ["100", "110", "111"] },
+    { text: "How many bits are in a byte?", correct: "8", wrongs: ["4", "16", "32"] },
+    { text: "What does 'ASCII' stand for in computing?", correct: "American Standard Code for Info Interchange", wrongs: ["Apple Standard Code", "Auto Secure Code", "Advanced Binary Code"] },
+    { text: "Which of these is a valid binary digit?", correct: "0", wrongs: ["2", "A", "B"] },
+    { text: "What is 1010₂ in decimal?", correct: "10", wrongs: ["8", "12", "5"] },
+    { text: "A group of 4 bits is called a:", correct: "Nibble", wrongs: ["Byte", "Word", "BitSlice"] },
+    { text: "What is 1 + 1 in binary??", correct: "10", wrongs: ["2", "0", "11"] },
+    { text: "Which base is the binary system?", correct: "Base-2", wrongs: ["Base-10", "Base-16", "Base-8"] },
+    { text: "What does 'bit' stand for?", correct: "Binary digit", wrongs: ["Byte index token", "Basic integer type", "Bidirectional transfer"] },
+    { text: "Why did the binary programmer go to therapy?", correct: "He had too many bits to process", wrongs: ["Because he lost his cache", "Stack overflow", "No sleep"] },
+    { text: "What is a computer's favorite beat?", correct: "An algorithm", wrongs: ["A drum loop", "A byte", "A gigabyte"] },
+    { text: "Which superhero uses binary code to fight?", correct: "The Bit Crusader", wrongs: ["Iron Man", "Batman (Binary?)", "Superman"] },
+    { text: "Why was the binary book sad?", correct: "It had too many 0's", wrongs: ["It got deleted", "No happy ending", "Too many 1's"] },
+    { text: "What do you call a computer that sings?", correct: "A Dell", wrongs: ["A MacBook", "A Chromebook", "A Raspberry Pi"] },
+    { text: "How many bytes are in a kilobyte (binary)?", correct: "1024", wrongs: ["1000", "512", "2048"] },
+    { text: "What is the 'spider' of the internet?", correct: "Web crawler", wrongs: ["Virus", "Firewall", "Cookie"] },
+    { text: "What is a popular Linux penguin mascot?", correct: "Tux", wrongs: ["Gnu", "Pingy", "Linus"] }
+  ];
 
-  const holesContainer = document.getElementById('holesGrid');
+  function getRandomItems(arr, count) {
+    const shuffled = [...arr];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+  }
+
+  // DOM elements
+  const holesGrid = document.getElementById('holesGrid');
   const scoreSpan = document.getElementById('scoreValue');
   const timerSpan = document.getElementById('timerValue');
   const bestSpan = document.getElementById('bestValue');
   const newGameBtn = document.getElementById('newGameBtn');
-  const statusMsgDiv = document.getElementById('gameStatusMsg');
+  const gameStatusSpan = document.getElementById('gameStatusMsg');
+  const questionTextEl = document.getElementById('questionText');
+  const questionTimerFill = document.getElementById('questionTimerFill');
 
   let holes = [];
-  let activeTimeouts = [];
+  let currentAnswers = [];
+  let currentQuestionObj = null;
   let gameActive = false;
   let currentScore = 0;
-  let timeLeft = INIT_TIME;
+  let timeLeft = 45;
   let bestScore = 0;
-  let spawnIntervalId = null;
-  let countdownIntervalId = null;
+  let gameInterval = null;
+  let questionTimeout = null;
+  let questionTickInterval = null;
+  let questionTimeLeft = 10;
+  let activeWhackLock = false;
 
   function loadBestScore() {
-    const saved = localStorage.getItem('whackBestScore');
-    if (saved !== null && !isNaN(parseInt(saved))) {
-      bestScore = parseInt(saved);
-    } else {
-      bestScore = 0;
-    }
+    const saved = localStorage.getItem('binaryWhackBest');
+    bestScore = (saved && !isNaN(parseInt(saved))) ? parseInt(saved) : 0;
     bestSpan.innerText = bestScore;
   }
 
-  function updateBestScoreIfNeeded() {
+  function saveBestScore() {
     if (currentScore > bestScore) {
       bestScore = currentScore;
       bestSpan.innerText = bestScore;
-      localStorage.setItem('whackBestScore', bestScore);
+      localStorage.setItem('binaryWhackBest', bestScore);
     }
   }
 
-  function deactivateAllMoles() {
-    for (let i = 0; i < holes.length; i++) {
-      if (holes[i].classList.contains('active')) {
-        holes[i].classList.remove('active');
-        holes[i].classList.remove('whacked');
-      }
-      if (activeTimeouts[i] !== null && activeTimeouts[i] !== undefined) {
-        clearTimeout(activeTimeouts[i]);
-        activeTimeouts[i] = null;
-      }
-    }
-  }
-
-  function hideMole(holeIndex) {
-    if (!holes[holeIndex]) return;
-    const hole = holes[holeIndex];
-    if (hole.classList.contains('active')) {
-      hole.classList.remove('active');
-      hole.classList.remove('whacked');
-    }
-    if (activeTimeouts[holeIndex]) {
-      clearTimeout(activeTimeouts[holeIndex]);
-      activeTimeouts[holeIndex] = null;
-    }
-  }
-
-  function whackMole(holeIndex) {
-    if (!gameActive) return false;
-    const hole = holes[holeIndex];
-    if (!hole.classList.contains('active')) return false;
-    
-    currentScore++;
-    scoreSpan.innerText = currentScore;
-    
-    if (currentScore > bestScore) {
-      bestScore = currentScore;
-      bestSpan.innerText = bestScore;
-      localStorage.setItem('whackBestScore', bestScore);
-    }
-    
-    hole.classList.add('whacked');
-    hole.classList.remove('active');
-    
-    if (activeTimeouts[holeIndex]) {
-      clearTimeout(activeTimeouts[holeIndex]);
-      activeTimeouts[holeIndex] = null;
-    }
-    
-    setTimeout(() => {
-      if (hole) hole.classList.remove('whacked');
-    }, 120);
-    return true;
-  }
-
-  function trySpawnMole() {
-    if (!gameActive) return false;
-    
-    const inactiveHoles = [];
-    for (let i = 0; i < holes.length; i++) {
-      if (!holes[i].classList.contains('active')) {
-        inactiveHoles.push(i);
-      }
-    }
-    
-    if (inactiveHoles.length === 0) return false;
-    
-    const randomIndex = Math.floor(Math.random() * inactiveHoles.length);
-    const chosenHoleIdx = inactiveHoles[randomIndex];
-    const hole = holes[chosenHoleIdx];
-    
-    hole.classList.add('active');
-    hole.classList.remove('whacked');
-    
-    const hideTimeout = setTimeout(() => {
-      if (gameActive && holes[chosenHoleIdx] && holes[chosenHoleIdx].classList.contains('active')) {
-        hideMole(chosenHoleIdx);
-      } else if (!gameActive && holes[chosenHoleIdx]) {
-        holes[chosenHoleIdx].classList.remove('active');
-      }
-      if (activeTimeouts[chosenHoleIdx]) activeTimeouts[chosenHoleIdx] = null;
-    }, MOLE_VISIBLE_TIME);
-    
-    if (activeTimeouts[chosenHoleIdx]) clearTimeout(activeTimeouts[chosenHoleIdx]);
-    activeTimeouts[chosenHoleIdx] = hideTimeout;
-    return true;
-  }
-
-  function startSpawner() {
-    if (spawnIntervalId) clearInterval(spawnIntervalId);
-    spawnIntervalId = setInterval(() => {
-      if (gameActive) {
-        trySpawnMole();
-      } else {
-        if (spawnIntervalId) {
-          clearInterval(spawnIntervalId);
-          spawnIntervalId = null;
-        }
-      }
-    }, SPAWN_INTERVAL_MS);
-  }
-
-  function updateTimerUI() {
+  function updateGameTimerUI() {
     timerSpan.innerText = timeLeft;
+    if (timeLeft <= 0 && gameActive) endGame();
+  }
+
+  function stopAllIntervalsAndTimeouts() {
+    if (gameInterval) { clearInterval(gameInterval); gameInterval = null; }
+    if (questionTimeout) { clearTimeout(questionTimeout); questionTimeout = null; }
+    if (questionTickInterval) { clearInterval(questionTickInterval); questionTickInterval = null; }
+  }
+
+  function clearAllMoles() {
+    for (let i = 0; i < holes.length; i++) {
+      const hole = holes[i];
+      hole.classList.remove('active-mole', 'whacked', 'wrong-flash');
+      const existingSpan = hole.querySelector('.mole-answer');
+      if (existingSpan) existingSpan.remove();
+    }
+    currentAnswers = [];
+  }
+
+  function removeMoleFromHole(holeIndex) {
+    const hole = holes[holeIndex];
+    if (!hole) return;
+    const answerSpan = hole.querySelector('.mole-answer');
+    if (answerSpan) answerSpan.remove();
+    hole.classList.remove('active-mole', 'whacked');
+    currentAnswers = currentAnswers.filter(a => a.holeIndex !== holeIndex);
+  }
+
+  function stopQuestionTimer() {
+    if (questionTimeout) {
+      clearTimeout(questionTimeout);
+      questionTimeout = null;
+    }
+  }
+
+  function resetQuestionTimer() {
+    if (!gameActive) return;
+    stopQuestionTimer();
+    questionTimeLeft = 10;
+    updateQuestionBar();
+    questionTimeout = setTimeout(() => {
+      if (gameActive) {
+        gameStatusSpan.innerHTML = "⏰ Time's up! Next question...";
+        stopQuestionTimer();
+        activeWhackLock = true;
+        setTimeout(() => {
+          if (gameActive) loadNextQuestion();
+          activeWhackLock = false;
+        }, 200);
+      }
+    }, 10000);
+  }
+
+  function updateQuestionBar() {
+    if (!gameActive) return;
+    const percent = (questionTimeLeft / 10) * 100;
+    questionTimerFill.style.width = `${Math.max(0, percent)}%`;
+  }
+
+  function startQuestionTick() {
+    if (questionTickInterval) clearInterval(questionTickInterval);
+    questionTickInterval = setInterval(() => {
+      if (!gameActive) return;
+      if (questionTimeLeft > 0) {
+        questionTimeLeft -= 0.1;
+        if (questionTimeLeft < 0) questionTimeLeft = 0;
+        updateQuestionBar();
+      }
+    }, 100);
   }
 
   function endGame() {
     if (!gameActive) return;
     gameActive = false;
-    
-    if (spawnIntervalId) {
-      clearInterval(spawnIntervalId);
-      spawnIntervalId = null;
-    }
-    if (countdownIntervalId) {
-      clearInterval(countdownIntervalId);
-      countdownIntervalId = null;
-    }
-    
-    deactivateAllMoles();
-    updateBestScoreIfNeeded();
-    statusMsgDiv.innerHTML = "💀 GAME OVER 💀";
-    statusMsgDiv.style.color = "#ffb47b";
+    stopAllIntervalsAndTimeouts();
+    clearAllMoles();
+    gameStatusSpan.innerHTML = "💀 GAME OVER 💀 Press New Game";
+    questionTextEl.innerHTML = "🔴 GAME OVER 🔴";
+    questionTimerFill.style.width = "0%";
   }
 
-  function countdownTick() {
-    if (!gameActive) {
-      if (countdownIntervalId) {
-        clearInterval(countdownIntervalId);
-        countdownIntervalId = null;
-      }
-      return;
+  function loadNextQuestion() {
+    if (!gameActive) return;
+    clearAllMoles();
+    stopQuestionTimer();
+    
+    const randomIndex = Math.floor(Math.random() * QUESTION_BANK.length);
+    const q = QUESTION_BANK[randomIndex];
+    currentQuestionObj = q;
+    questionTextEl.innerHTML = `🧠 ${q.text} 🧠`;
+    
+    let wrongPool = [...q.wrongs];
+    const fallbackWrongs = ["0101", "N/A", "Maybe?", "False", "True", "B100", "0b10"];
+    while (wrongPool.length < 3) wrongPool.push(...fallbackWrongs);
+    const selectedWrongs = getRandomItems(wrongPool, 3);
+    const answerOptions = [
+      { text: q.correct, isCorrect: true },
+      { text: selectedWrongs[0], isCorrect: false },
+      { text: selectedWrongs[1], isCorrect: false },
+      { text: selectedWrongs[2], isCorrect: false }
+    ];
+    for (let i = answerOptions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [answerOptions[i], answerOptions[j]] = [answerOptions[j], answerOptions[i]];
     }
     
-    if (timeLeft <= 1) {
-      timeLeft = 0;
-      updateTimerUI();
-      endGame();
+    const holeIndices = Array.from({ length: holes.length }, (_, i) => i);
+    for (let i = holeIndices.length - 1; i > 0; i--) {
+      const r = Math.floor(Math.random() * (i + 1));
+      [holeIndices[i], holeIndices[r]] = [holeIndices[r], holeIndices[i]];
+    }
+    const selectedHoles = holeIndices.slice(0, 4);
+    
+    currentAnswers = [];
+    for (let i = 0; i < answerOptions.length; i++) {
+      const holeIdx = selectedHoles[i];
+      const answer = answerOptions[i];
+      const holeDiv = holes[holeIdx];
+      const oldSpan = holeDiv.querySelector('.mole-answer');
+      if (oldSpan) oldSpan.remove();
+      const answerSpan = document.createElement('div');
+      answerSpan.className = 'mole-answer';
+      answerSpan.innerText = answer.text;
+      holeDiv.appendChild(answerSpan);
+      holeDiv.classList.add('active-mole');
+      currentAnswers.push({ holeIndex: holeIdx, answerText: answer.text, isCorrect: answer.isCorrect });
+    }
+    
+    questionTimeLeft = 10;
+    updateQuestionBar();
+    resetQuestionTimer();
+    gameStatusSpan.innerHTML = "🔨 WHACK THE CORRECT MOLE! 🔨";
+  }
+
+  function handleWhack(holeIndex) {
+    if (!gameActive || activeWhackLock) return false;
+    const answerEntry = currentAnswers.find(a => a.holeIndex === holeIndex);
+    if (!answerEntry) return false;
+    
+    const hole = holes[holeIndex];
+    const isCorrect = answerEntry.isCorrect;
+    
+    hole.classList.add('whacked');
+    setTimeout(() => hole.classList.remove('whacked'), 150);
+    
+    if (isCorrect) {
+      currentScore++;
+      scoreSpan.innerText = currentScore;
+      saveBestScore();
+      gameStatusSpan.innerHTML = "✅ CORRECT! +1 point! ✅";
+      removeMoleFromHole(holeIndex);
+      stopQuestionTimer();
+      activeWhackLock = true;
+      setTimeout(() => {
+        if (gameActive) loadNextQuestion();
+        activeWhackLock = false;
+      }, 250);
     } else {
-      timeLeft--;
-      updateTimerUI();
+      currentScore = Math.max(0, currentScore - 1);
+      scoreSpan.innerText = currentScore;
+      timeLeft = Math.max(0, timeLeft - 1);
+      updateGameTimerUI();
+      gameStatusSpan.innerHTML = `❌ WRONG! -1 point & -1 sec! ❌`;
+      hole.classList.add('wrong-flash');
+      setTimeout(() => hole.classList.remove('wrong-flash'), 200);
+      removeMoleFromHole(holeIndex);
+      
+      const stillHasCorrect = currentAnswers.some(a => a.isCorrect === true);
+      if (!stillHasCorrect) {
+        gameStatusSpan.innerHTML = "⚠️ Correct answer vanished! Next question...";
+        stopQuestionTimer();
+        activeWhackLock = true;
+        setTimeout(() => {
+          if (gameActive) loadNextQuestion();
+          activeWhackLock = false;
+        }, 500);
+      } else {
+        resetQuestionTimer();
+      }
     }
+    if (timeLeft <= 0) endGame();
+    return true;
   }
 
-  function startCountdown() {
-    if (countdownIntervalId) clearInterval(countdownIntervalId);
-    countdownIntervalId = setInterval(() => {
-      countdownTick();
+  function startGlobalTimer() {
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(() => {
+      if (!gameActive) return;
+      if (timeLeft > 0) {
+        timeLeft--;
+        updateGameTimerUI();
+        if (timeLeft === 0) endGame();
+      } else {
+        endGame();
+      }
     }, 1000);
   }
 
-  function resetAndStartGame() {
-    if (spawnIntervalId) {
-      clearInterval(spawnIntervalId);
-      spawnIntervalId = null;
-    }
-    if (countdownIntervalId) {
-      clearInterval(countdownIntervalId);
-      countdownIntervalId = null;
-    }
-    
-    for (let i = 0; i < holes.length; i++) {
-      if (activeTimeouts[i]) {
-        clearTimeout(activeTimeouts[i]);
-        activeTimeouts[i] = null;
-      }
-      holes[i].classList.remove('active');
-      holes[i].classList.remove('whacked');
+  function startNewGame() {
+    // Kill all existing timers to prevent freezing
+    stopAllIntervalsAndTimeouts();
+    if (gameActive) {
+      gameActive = false;
+      clearAllMoles();
     }
     
     gameActive = true;
     currentScore = 0;
-    timeLeft = INIT_TIME;
+    timeLeft = 45;
     scoreSpan.innerText = "0";
-    updateTimerUI();
+    updateGameTimerUI();
     loadBestScore();
-    statusMsgDiv.innerHTML = "🐭 WHACK! GAME ACTIVE 🐭";
-    statusMsgDiv.style.color = "#ffe3aa";
+    gameStatusSpan.innerHTML = "🎉 NEW GAME! WHACK SMART! 🎉";
+    activeWhackLock = false;
     
-    startSpawner();
-    startCountdown();
+    clearAllMoles();
+    startGlobalTimer();
+    startQuestionTick();
+    loadNextQuestion();
   }
 
-  function setupHoleClickHandler(hole, idx) {
-    hole.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!gameActive) return;
-      if (hole.classList.contains('active')) {
-        whackMole(idx);
-      }
-    });
-  }
-
-  function buildGameBoard() {
-    holesContainer.innerHTML = '';
-    const holeCount = 9;
-    for (let i = 0; i < holeCount; i++) {
-      const holeDiv = document.createElement('div');
-      holeDiv.className = 'hole';
-      holeDiv.setAttribute('data-idx', i);
-      
-      const moleSpan = document.createElement('div');
-      moleSpan.className = 'mole';
-      const moleVariants = ['🐭', '🐹', '🐭✨', '🐭💥', '🐭⚡'];
-      moleSpan.innerText = moleVariants[i % moleVariants.length];
-      holeDiv.appendChild(moleSpan);
-      holesContainer.appendChild(holeDiv);
+  function buildHoles() {
+    holesGrid.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+      const hole = document.createElement('div');
+      hole.className = 'hole';
+      hole.setAttribute('data-idx', i);
+      hole.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!gameActive) return;
+        const idx = parseInt(hole.getAttribute('data-idx'));
+        handleWhack(idx);
+      });
+      holesGrid.appendChild(hole);
     }
-    
     holes = Array.from(document.querySelectorAll('.hole'));
-    activeTimeouts = new Array(holes.length).fill(null);
-    
-    holes.forEach((hole, idx) => {
-      setupHoleClickHandler(hole, idx);
-    });
   }
 
-  function attachNewGameButton() {
+  function attachEvents() {
     newGameBtn.addEventListener('click', () => {
-      if (gameActive) {
-        if (spawnIntervalId) clearInterval(spawnIntervalId);
-        if (countdownIntervalId) clearInterval(countdownIntervalId);
-        spawnIntervalId = null;
-        countdownIntervalId = null;
-        gameActive = false;
-        deactivateAllMoles();
-      }
-      resetAndStartGame();
+      startNewGame();
     });
   }
 
   function initGame() {
-    buildGameBoard();
+    buildHoles();
+    attachEvents();
     loadBestScore();
-    attachNewGameButton();
-    gameActive = false;
-    statusMsgDiv.innerHTML = "🔨 PRESS 'NEW GAME' 🔨";
-    statusMsgDiv.style.color = "#ffdd99";
-    scoreSpan.innerText = "0";
-    timerSpan.innerText = INIT_TIME;
-    deactivateAllMoles();
-    if (spawnIntervalId) clearInterval(spawnIntervalId);
-    if (countdownIntervalId) clearInterval(countdownIntervalId);
-    spawnIntervalId = null;
-    countdownIntervalId = null;
+    // Auto-start the game so it doesn't freeze on opening
+    startNewGame();
   }
 
-  window.addEventListener('DOMContentLoaded', initGame);
+  initGame();
 </script>
 </body>
 </html>
